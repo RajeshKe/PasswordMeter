@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>Password Strength Meter</title>
+    <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+
+    <script type="module">
+      import '@polymer/iron-demo-helpers/demo-pages-shared-styles';
+      import '@polymer/iron-demo-helpers/demo-snippet';
+    </script>
+
+    <script type="module" src="../pws-meter.js"></script>
+
+    <custom-style>
+      <style is="custom-style" include="demo-pages-shared-styles">
+        .myelement {
+            width:400px;
+            min-height:200px;
+            height:auto;
+            display:block;
+            border:2px solid #ddd;
+            margin-top:40px;
+            margin-left:auto;
+            margin-right:auto;
+            padding:20px;
+        }
+        
+      </style>
+    </custom-style>
+  </head>
+  <body>
+      <div class="myelement">
+          <h1>Password Strength Meter</h1>
+          <input type="text" name="psmeter" value="" onkeyup="myFunction(event)" style="width:100%;height:40px;border:1px solid black;"/>
+          <div id="myelediv"></div>
+      </div>
+  </body>
+</html>
+<script>
+    function myFunction(event) { 
+        let value = event.target.value;
+        let myelementdiv = document.getElementById('myelediv');
+        let rangecolorsdata = {
+          tooshort:'red',
+          weak:'green'
+        };
+        myelementdiv.innerHTML = "<pws-meter mypassword="+value+" customsg='sample message'  strengthrange='basic' rangecolors={'one':'1','two':'2'} infoicon='enable' iconmessage='Your password must contain  following characters' ></pws-meter>";
+        
+    }
+    </script>

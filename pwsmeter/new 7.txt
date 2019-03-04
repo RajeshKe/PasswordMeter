@@ -1,0 +1,14 @@
+if(this.mypassword.length<6) {
+           
+            this.passwordscore = 1;
+            this.dynamicmsg = "Your Password is Too Short";
+            
+        } else {
+            this.passwordscore = 2;
+            this.dynamicmsg = "Your Password is Week";
+        }
+        this.indicatorcolor = "score"+this.passwordscore;
+
+        if(this.customsg!='' && this.customsg.length>0 && this.customsg!='undefined') {
+            this.dynamicmsg = this.customsg;
+        } 
