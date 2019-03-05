@@ -18,37 +18,54 @@ class PwsMeter extends PolymerElement {
           .score4 { background-color:blue; width:75%; }
           .score5 { background-color:green; width:95%; }
           .meterouterdiv { width:100%; margin-top:8px; height:10px; background-color:#ddd; }
-          .custom_msg { font-size:14px; color:black; }
-          .info_icon { float:right; color:red; border:1px solid red; }
+          .custom_msg { font-size:14px; color:black;min-height:20px; }
+          .info_icon { float:right; color:#ffa64d; font-size:18px; }
+          .indicator_outer_div { margin-top:10px;width:100%; }
+          .advanceindicator { font-size:12px; color:red; min-height:20px; display:none; margin-top:5px; }
       </style>
-      <div style="margin-top:10px;width:100%;">
+      <div class="indicator_outer_div" style$="{{showindicator}}">
           <div class="custom_msg">[[dynamicmsg]]
-            <span class="info_icon" title$="{{iconmessage}}" style$="{{showinfo}}">icon[[rangecolors.one]]</span>
+            <span class="info_icon" title$="{{iconmessage}}" style$="{{showinfo}}">&#9888;</span>
           </div>
           <div class="meterouterdiv">
               <div class$="{{indicatorcolor}}" style="height:100%;"></div>
+          </div>
+          <div class="advanceindicator" style$="{{showadvanceerror}}">
+                [[advancerrormsg]]
           </div>
       </div>`;
     }
     
   static get properties() {
       return {
-          mypassword:     { type: String, value:'', observer: '_dynamicPassword' },
+
+          mypassword:     { type:String, value:'' },
           customsg:       { type:String, value:'', /*observer:'_CustomText'*/ },
-          passwordscore:  { type: Number, value:'' },
+          passwordscore:  { type:Number, value:'' },
+          username:       { type:String, value:'' },
           msgcolor:       { type:String, value:'' },
-          dynamicmsg:     { type: String, value:'' },
-          indicatorcolor: { type: String, value:'' },
+          dynamicmsg:     { type:String, value:'' },
+          indicatorcolor: { type:String, value:'' },
           strengthrange:  { type:String, value:'' },
           rangecolors:    { type:Object, value:'' },
           infoicon:       { type:String, value:'' }, 
           iconmessage:    { type:String, value:'' },
-          showinfo :      { type:String, value:''}
+          showinfo :      { type:String, value:'' },
+          showindicator:  { type:String, value:'' },
+          advancerrormsg: { type:String, value:'' },
+          showadvanceerror: { type:String, value:'' }
 
       }
   }
 
-  checkPasswordFun(pass) { 
+  static get observers() {
+    return [
+      // Observer method name, followed by a list of dependencies, in parenthesis
+      '_dynamicPassword(mypassword, filter)'
+    ]
+  }
+
+  checkPasswordFun(pass) {  
     
       let score = 0;
       if (!pass) {
@@ -80,24 +97,30 @@ class PwsMeter extends PolymerElement {
       
   }
 
-  _dynamicPassword(password) {  
-      if(password!='' && password!='undefined' && password.length>0) { 
-          
+    checkusernameexistfun (username,password){
+        return password.match(/[a-z]+/ig).filter(a=> a.length > 4 && username.includes(a)).length > 0? true:false;
+    }
+
+  _dynamicPassword(password) {  console.log(this.strengthrange)
+      
+    if(password!='' && password!='undefined' && password.length>0) { 
+
+        this.showindicator = "display:block";  
         let finalscore = this.checkPasswordFun(password);
-       
-        if (finalscore > 80) {
+
+        if (finalscore > 80 && password!='') {
               //password strong section here.
               this.passwordscore = 5;
               this.dynamicmsg = "Your Password is Strong";
-        }else if (finalscore > 60) {
+        }else if (finalscore > 60 && password!='') {
             //password good section here.
               this.passwordscore = 4;
               this.dynamicmsg = "Your Password is Good";
-        } else if(finalscore > 45){
+        } else if(finalscore > 45 && password!=''){
             //password fair section here.
               this.passwordscore = 3;
               this.dynamicmsg = "Your Password is Fair";
-        } else if (finalscore >= 30) {
+        } else if (finalscore >= 30 && password!='') {
             //password weak section here.
               this.passwordscore = 2;
               this.dynamicmsg = "Your Password is Weak";
@@ -114,17 +137,31 @@ class PwsMeter extends PolymerElement {
 
         if(this.infoicon=='enable') { this.showinfo = "display:block;" } else { this.showinfo = "display:none;" }
 
-        if(this.iconmessage=='' || this.iconmessage=='undefined') {
-            this.iconmessage = "Dynamic icon message comes here";
+        if(this.iconmessage=='' || this.iconmessage=='undefined') { this.iconmessage = "Dynamic icon message comes here"; }
+
+        if(this.strengthrange!='' && this.strengthrange=='advanced' && this.username!='' && this.username!='undefined') {
+            
+            if(this.checkusernameexistfun(this.username, password)) {
+                this.showadvanceerror   = "display:block";
+                this.advancerrormsg     = "Your password should not contain the username";
+            } else {
+                this.showadvanceerror   = "display:none";
+                this.advancerrormsg     = "";
+            }
+        } else {
+            this.showadvanceerror   = "display:none";
+            this.advancerrormsg     = "";
         }
 
-        if(this.rangecolors!='') {
-            console.log(this.rangecolors.one)
+        /*if(this.rangecolors!='') {
+            console.log(this.rangecolors)
             /*for(let colordata in this.rangecolors) {
                 console.log(colordata);
-            }*/
-        }
-      }
+            }
+        }*/
+    } else {
+        this.showindicator = "display:none";
+    }
             
   }
 
